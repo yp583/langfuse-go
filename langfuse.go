@@ -26,8 +26,10 @@ type Langfuse struct {
 }
 
 func New(ctx context.Context) *Langfuse {
-	client := api.New()
+	return NewWithClient(ctx, api.New())
+}
 
+func NewWithClient(ctx context.Context, client *api.Client) *Langfuse {
 	l := &Langfuse{
 		flushInterval: defaultFlushInterval,
 		client:        client,
@@ -68,9 +70,9 @@ func ingest(ctx context.Context, client *api.Client, events []model.IngestionEve
 }
 
 func (l *Langfuse) Trace(t *model.Trace) (*model.Trace, error) {
+	t.ID = utils.BuildID(&t.ID)
 	t.ShouldTrace = rand.Float32() < l.samplingRate
 	if (t.ShouldTrace) {
-		t.ID = utils.BuildID(&t.ID)
 		l.observer.Dispatch(
 			model.IngestionEvent{
 				ID:        utils.BuildID(nil),

@@ -22,11 +22,14 @@ func New() *Client {
 	if langfuseHost == "" {
 		langfuseHost = langfuseDefaultEndpoint
 	}
+	return NewWithHost(langfuseHost)
+}
 
+func NewWithHost(host string) *Client {
 	publicKey := os.Getenv("LANGFUSE_PUBLIC_KEY")
 	secretKey := os.Getenv("LANGFUSE_SECRET_KEY")
 
-	restClient := restclientgo.New(langfuseHost)
+	restClient := restclientgo.New(host)
 	restClient.SetRequestModifier(func(req *http.Request) *http.Request {
 		req.Header.Set("Authorization", basicAuth(publicKey, secretKey))
 		return req
