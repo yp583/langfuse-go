@@ -23,18 +23,19 @@ type IngestionEvent struct {
 }
 
 type Trace struct {
-	ID        string     `json:"id,omitempty"`
-	Timestamp *time.Time `json:"timestamp,omitempty"`
-	Name      string     `json:"name,omitempty"`
-	UserID    string     `json:"userId,omitempty"`
-	Input     any        `json:"input,omitempty"`
-	Output    any        `json:"output,omitempty"`
-	SessionID string     `json:"sessionId,omitempty"`
-	Release   string     `json:"release,omitempty"`
-	Version   string     `json:"version,omitempty"`
-	Metadata  any        `json:"metadata,omitempty"`
-	Tags      []string   `json:"tags,omitempty"`
-	Public    bool       `json:"public,omitempty"`
+	ID          string     `json:"id,omitempty"`
+	Timestamp   *time.Time `json:"timestamp,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	UserID      string     `json:"userId,omitempty"`
+	Input       any        `json:"input,omitempty"`
+	Output      any        `json:"output,omitempty"`
+	SessionID   string     `json:"sessionId,omitempty"`
+	Release     string     `json:"release,omitempty"`
+	Version     string     `json:"version,omitempty"`
+	Metadata    any        `json:"metadata,omitempty"`
+	Tags        []string   `json:"tags,omitempty"`
+	Public      bool       `json:"public,omitempty"`
+	Environment string     `json:"environment,omitempty"`
 	ShouldTrace bool
 }
 
@@ -66,7 +67,8 @@ type Generation struct {
 	Usage               Usage            `json:"usage,omitempty"`
 	PromptName          string           `json:"promptName,omitempty"`
 	PromptVersion       int              `json:"promptVersion,omitempty"`
-	Trace_							*Trace
+	Environment         string           `json:"environment,omitempty"`
+	Trace_              *Trace
 }
 
 type Usage struct {
@@ -100,7 +102,8 @@ type Score struct {
 	Value         float64 `json:"value,omitempty"`
 	ObservationID string  `json:"observationId,omitempty"`
 	Comment       string  `json:"comment,omitempty"`
-	Trace_							*Trace
+	Environment   string  `json:"environment,omitempty"`
+	Trace_        *Trace
 }
 
 type Span struct {
@@ -116,7 +119,8 @@ type Span struct {
 	Version             string           `json:"version,omitempty"`
 	ID                  string           `json:"id,omitempty"`
 	EndTime             *time.Time       `json:"endTime,omitempty"`
-	Trace_							*Trace
+	Environment         string           `json:"environment,omitempty"`
+	Trace_              *Trace
 }
 
 type Event struct {
@@ -131,7 +135,8 @@ type Event struct {
 	ParentObservationID string           `json:"parentObservationId,omitempty"`
 	Version             string           `json:"version,omitempty"`
 	ID                  string           `json:"id,omitempty"`
-	Trace_							*Trace
+	Environment         string           `json:"environment,omitempty"`
+	Trace_              *Trace
 }
 
 type M map[string]interface{}
@@ -139,23 +144,35 @@ type M map[string]interface{}
 func (g *Generation) SetTrace(t *Trace) *Generation {
 	g.Trace_ = t
 	g.TraceID = t.ID
+	if g.Environment == "" {
+		g.Environment = t.Environment
+	}
 	return g
 }
 
 func (s *Score) SetTrace(t *Trace) *Score {
 	s.Trace_ = t
 	s.TraceID = t.ID
+	if s.Environment == "" {
+		s.Environment = t.Environment
+	}
 	return s
 }
 
 func (s *Span) SetTrace(t *Trace) *Span {
 	s.Trace_ = t
 	s.TraceID = t.ID
+	if s.Environment == "" {
+		s.Environment = t.Environment
+	}
 	return s
 }
 
 func (e *Event) SetTrace(t *Trace) *Event {
 	e.Trace_ = t
 	e.TraceID = t.ID
+	if e.Environment == "" {
+		e.Environment = t.Environment
+	}
 	return e
 }
