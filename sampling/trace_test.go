@@ -88,3 +88,21 @@ func TestTraceSampling100(t *testing.T) {
 
 	assertSamplingRate(t, 1.0, counter.Get(), traceIterations, 0)
 }
+
+func TestTraceShouldTraceOverridesSampling(t *testing.T) {
+	counter := &EventCounter{}
+	server := createMockServer(t, counter)
+	defer server.Close()
+
+	ctx := context.Background()
+	lf := createLangfuse(ctx, server.URL, 0)
+
+	for i := 0; i < traceIterations; i++ {
+		lf.Trace(&model.Trace{Name: "test-trace", ShouldTrace: true})
+	}
+	lf.Flush(ctx)
+
+	if counter.Get() != traceIterations {
+		t.Errorf("expected all %d traces to be sent when ShouldTrace=true, got %d", traceIterations, counter.Get())
+	}
+}

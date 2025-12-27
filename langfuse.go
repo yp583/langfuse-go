@@ -71,8 +71,10 @@ func ingest(ctx context.Context, client *api.Client, events []model.IngestionEve
 
 func (l *Langfuse) Trace(t *model.Trace) (*model.Trace, error) {
 	t.ID = utils.BuildID(&t.ID)
-	t.ShouldTrace = rand.Float32() < l.samplingRate
-	if (t.ShouldTrace) {
+	if !t.ShouldTrace {
+		t.ShouldTrace = rand.Float32() < l.samplingRate
+	}
+	if t.ShouldTrace {
 		l.observer.Dispatch(
 			model.IngestionEvent{
 				ID:        utils.BuildID(nil),
